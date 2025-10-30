@@ -1,0 +1,19 @@
+{
+  "name": "jlpt-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "migrate": "npm --prefix backend run migrate"
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}
