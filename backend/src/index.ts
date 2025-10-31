@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import healthRouter from './routes/health'
 import vocabRouter from './routes/vocab'
 import path from 'path'
@@ -7,6 +8,10 @@ import path from 'path'
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 const app = express()
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}))
 app.use(express.json())
 
 app.use('/api/health', healthRouter)
