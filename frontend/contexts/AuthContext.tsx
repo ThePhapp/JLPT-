@@ -8,6 +8,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<void>
+  register: (email: string, password: string) => Promise<void>
   logout: () => void
   isLoading: boolean
 }
@@ -39,6 +40,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error
       }
     },
+    register: async (email: string, password: string) => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        })
+        
+        if (!response.ok) throw new Error('Registration failed')
+        
+        const data = await response.json()
+        if (!data.success) {
+          throw new Error(data.message || 'Registration failed')
+        }
+      } catch (error) {
+        console.error('Registration error:', error)
+        throw error
+      }
+    },
     logout: () => {
       setUser(null)
       globalThis.localStorage.removeItem('user')
@@ -61,31 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false)
     }
   }, [])
-
-  const login = async (email: string, password: string) => {
-    try {
-      // TODO: Replace with real API call
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      
-      if (!response.ok) throw new Error('Login failed')
-      
-      const userData = await response.json()
-      setUser(userData)
-      localStorage.setItem('user', JSON.stringify(userData))
-    } catch (error) {
-      console.error('Login error:', error)
-      throw error
-    }
-  }
-
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
-  }
 
   return (
     <AuthContext.Provider value={authValue}>

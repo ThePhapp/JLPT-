@@ -1,15 +1,14 @@
 import { useRouter } from 'next/router'
 import Layout from '../components/layout/Layout'
 import { useAuth } from '../contexts/AuthContext'
-import LoginForm from '../components/auth/LoginForm'
+import RegisterForm from '../components/auth/RegisterForm'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { user } = useAuth()
   const router = useRouter()
-  const { redirect } = router.query
 
   if (user) {
-    router.push(typeof redirect === 'string' ? redirect : '/')
+    router.push('/')
     return null
   }
 
@@ -19,19 +18,18 @@ export default function LoginPage() {
         <div className="max-w-md w-full space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-              Đăng nhập
+              Đăng ký tài khoản mới
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-              Hoặc{' '}
-              <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                đăng ký tài khoản mới
+              Đã có tài khoản?{' '}
+              <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                Đăng nhập
               </a>
             </p>
           </div>
-          <LoginForm 
+          <RegisterForm
             onSuccess={() => {
-              const redirectPath = typeof redirect === 'string' ? redirect : '/'
-              router.push(redirectPath)
+              router.push('/login')
             }}
           />
         </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import ProtectedLayout from '../components/layout/ProtectedLayout'
-import { useRouter } from 'next/router'
 
 interface VocabularyItem {
   id: number
@@ -22,44 +21,35 @@ interface VocabularyItem {
   stroke_count?: number
 }
 
-export default function VocabPage() {
-  const router = useRouter()
+export default function VocabularyPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedLevel, setSelectedLevel] = useState<string>('')
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    const fetchVocabulary = async () => {
-      try {
-        const params = new URLSearchParams()
-        if (searchTerm) params.append('search', searchTerm)
-        if (selectedLevel) params.append('level', selectedLevel)
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/vocabulary?${params.toString()}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          }
-        )
-        
-        if (!response.ok) throw new Error('Failed to fetch vocabulary')
-        
-        const data = await response.json()
-        setVocabulary(data)
-        setError('')
-      } catch (err) {
-        setError('Could not load vocabulary')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchVocabulary()
   }, [searchTerm, selectedLevel])
+
+  const fetchVocabulary = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (searchTerm) params.append('search', searchTerm)
+      if (selectedLevel) params.append('level', selectedLevel)
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/vocabulary?${params.toString()}`
+      )
+      if (!response.ok) throw new Error('Failed to fetch vocabulary')
+      
+      const data = await response.json()
+      setVocabulary(data)
+    } catch (error) {
+      console.error('Error fetching vocabulary:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const jlptLevels = ['N5', 'N4', 'N3', 'N2', 'N1']
 
@@ -67,7 +57,7 @@ export default function VocabPage() {
     <ProtectedLayout>
       <div className="space-y-6">
         <div className="sm:flex sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Từ vựng JLPT</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Vocabulary</h1>
           <div className="mt-4 sm:mt-0 sm:flex sm:space-x-4">
             {/* Search Input */}
             <div className="relative rounded-md shadow-sm">
@@ -76,7 +66,7 @@ export default function VocabPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white pr-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="Tìm kiếm từ vựng..."
+                placeholder="Search vocabulary..."
               />
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                 <svg
@@ -101,7 +91,7 @@ export default function VocabPage() {
               onChange={(e) => setSelectedLevel(e.target.value)}
               className="mt-2 sm:mt-0 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
             >
-              <option value="">Tất cả các cấp độ</option>
+              <option value="">All Levels</option>
               {jlptLevels.map((level) => (
                 <option key={level} value={level}>
                   {level}
@@ -111,18 +101,7 @@ export default function VocabPage() {
           </div>
         </div>
 
-        {error && (
-          <div className="rounded-md bg-red-50 dark:bg-red-900 p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                  {error}
-                </h3>
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* Vocabulary List */}
         {loading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500" />
@@ -132,7 +111,7 @@ export default function VocabPage() {
             {vocabulary.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg hover:shadow-lg transition-shadow duration-200"
+                className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg"
               >
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-start">
@@ -154,11 +133,11 @@ export default function VocabPage() {
                   {/* Meanings */}
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Nghĩa
+                      Meanings
                     </h4>
                     <ul className="mt-2 text-sm text-gray-900 dark:text-white">
                       {item.meanings.map((meaning, index) => (
-                        <li key={`${item.id}-meaning-${index}`}>{meaning}</li>
+                        <li key={index}>{meaning}</li>
                       ))}
                     </ul>
                   </div>
@@ -167,11 +146,11 @@ export default function VocabPage() {
                   {item.examples.length > 0 && (
                     <div className="mt-4">
                       <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Ví dụ
+                        Examples
                       </h4>
                       <ul className="mt-2 space-y-2">
                         {item.examples.map((example, index) => (
-                          <li key={`${item.id}-example-${index}`} className="text-sm">
+                          <li key={index} className="text-sm">
                             <p className="text-gray-900 dark:text-white">
                               {example.japanese}
                             </p>
@@ -188,12 +167,12 @@ export default function VocabPage() {
                   {item.components && item.components.length > 0 && (
                     <div className="mt-4">
                       <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Thành phần Kanji
+                        Kanji Components
                       </h4>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {item.components.map((component, index) => (
                           <div
-                            key={`${item.id}-component-${index}`}
+                            key={index}
                             className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 dark:bg-gray-700"
                           >
                             <span className="font-medium text-gray-900 dark:text-white">
@@ -213,7 +192,7 @@ export default function VocabPage() {
                     <div className="mt-4 flex flex-wrap gap-2">
                       {item.tags.map((tag, index) => (
                         <span
-                          key={`${item.id}-tag-${index}`}
+                          key={index}
                           className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                         >
                           {tag}
@@ -224,12 +203,6 @@ export default function VocabPage() {
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {!loading && vocabulary.length === 0 && (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            Không tìm thấy từ vựng phù hợp với tiêu chí của bạn
           </div>
         )}
       </div>

@@ -6,14 +6,20 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "migrate": "node src/seed.js"
+    "migrate": "node-pg-migrate up -j sql -m src/migrations -f config/database.json"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "16.3.1",
     "express": "4.18.2",
-    "pg": "8.11.1"
+    "jsonwebtoken": "^9.0.2",
+    "node-pg-migrate": "^8.0.3",
+    "pg": "8.11.1",
+    "pg-promise": "^12.2.0"
   },
   "devDependencies": {
     "@types/express": "4.17.21",

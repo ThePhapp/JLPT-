@@ -1,10 +1,12 @@
+import { useState } from 'react'
+
 interface SearchBarProps {
-  onSearch: (query: string) => void
-  onFilterLevel: (level: string) => void
-  selectedLevel: string
+  readonly onSearch: (query: string) => void
+  readonly onFilterLevel: (level: string) => void
+  readonly selectedLevel: string
 }
 
-export default function SearchBar({ onSearch, onFilterLevel, selectedLevel }: SearchBarProps) {
+export default function SearchBar({ onSearch, onFilterLevel, selectedLevel }: Readonly<SearchBarProps>) {
   const [searchQuery, setSearchQuery] = useState('')
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
