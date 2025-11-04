@@ -11,7 +11,6 @@ interface StudyStats {
 export default function DashboardPage() {
   const { user } = useAuth()
 
-  // TODO: Replace with actual API call
   const stats: StudyStats = {
     wordsLearned: 150,
     accuracy: 85,

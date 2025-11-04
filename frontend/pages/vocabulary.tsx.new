@@ -1,8 +1,8 @@
-import React from 'react'
 import ProtectedLayout from '../components/layout/ProtectedLayout'
 import Mazii from '../components/vocabulary/Mazii'
+import { useState } from 'react'
 
-const VocabularyPage = () => {
+export default function VocabularyPage() {
   return (
     <ProtectedLayout>
       <div className="space-y-6">
@@ -14,5 +14,3 @@ const VocabularyPage = () => {
     </ProtectedLayout>
   )
 }
-
-export default VocabularyPage
